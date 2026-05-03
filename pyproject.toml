@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ggapp"
+version = "0.1.0"
+description = "GPU-accelerated Gaussian Process Prior"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "Douglas Brinkerhoff" }]
+dependencies = [
+    "cupy",
+    "glide",
+]
+
+[tool.setuptools.packages.find]
+include = ["ggapp*"]
+exclude = ["examples*"]
+
+[tool.setuptools.package-data]
+ggapp = ["cuda/*.cu"]
