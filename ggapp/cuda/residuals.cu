@@ -4,6 +4,7 @@ void compute_residual(
     const float* __restrict__ u,
     const float* __restrict__ rhs,
     float kappa,
+    float delta,
     float dx,
     int ny, int nx, 
     int stride, int halo)
@@ -24,7 +25,7 @@ void compute_residual(
 	float u_b = i < (ny-1) ? u[(i + 1) * nx + j] : u[i * nx + j];
 
         
-        float laplacian = (4.0f * u_c - u_r - u_l - u_t - u_b)/(dx * dx);
+        float laplacian = delta*(4.0f * u_c - u_r - u_l - u_t - u_b)/(dx * dx);
         float mass = kappa * kappa * u_c;
 	float forcing = rhs[i * nx + j];
 

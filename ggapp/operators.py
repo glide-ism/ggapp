@@ -60,6 +60,7 @@ class ForwardOperators:
                 state.u.data,  
                 f,
                 parameters.kappa.value,
+                parameters.delta.value,
                 grid.dx,
                 grid.ny, grid.nx, 
                 stride, halo)) 
@@ -81,6 +82,7 @@ class ForwardOperators:
                (state.u.data, 
                 self.r_u,
                 parameters.kappa.value,
+                parameters.delta.value,
                 grid.dx,
                 grid.ny, grid.nx, stride, halo, 
                 self.jacobi_config.omega)

@@ -37,6 +37,14 @@ class Parameters:
             attrs={'long_name':"smoothness parameter"})
         )
 
+    delta: Constant = field(
+        default_factory=lambda: Constant(
+            value=cp.float32(1.0),
+            name='delta',
+            units='',
+            attrs={'long_name':"oversmoother"})
+        )
+
     @property
     def d(self):
         return Constant(

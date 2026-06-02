@@ -197,6 +197,13 @@ class MGParameterManager:
             name="nu",
         )
 
+        self.delta = HierarchyFieldManager(
+            mg.levels,
+            getter=lambda g: g.parameters.delta,
+            restrict=lambda f,c: c.set(f.value),
+            name="delta",
+        )
+
     def __repr__(self):
         return f'Top-level ({self.mg.n_levels} levels): \n'+self.mg.levels[0].forcing.__repr__()
 
