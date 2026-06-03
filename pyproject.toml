@@ -11,11 +11,15 @@ license = { file = "LICENSE" }
 requires-python = ">=3.10"
 authors = [{ name = "Douglas Brinkerhoff" }]
 dependencies = [
-    "cupy-cuda12x>=12.0.0",
     "glide",
 ]
 
 [project.optional-dependencies]
+# CuPy ships a separate binary wheel per CUDA major version, with no universal
+# wheel. Install the extra matching your CUDA toolkit, e.g. `pip install ggapp[cuda12]`.
+cuda11 = ["cupy-cuda11x>=12.0.0"]
+cuda12 = ["cupy-cuda12x>=12.0.0"]
+cuda13 = ["cupy-cuda13x>=13.0.0"]
 # PyTorch autograd integration (ggapp.torch). Not required by the core package.
 torch = [
     "torch>=2.0",
