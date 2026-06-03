@@ -15,6 +15,17 @@ dependencies = [
     "glide",
 ]
 
+[project.optional-dependencies]
+# PyTorch autograd integration (ggapp.torch). Not required by the core package.
+torch = [
+    "torch>=2.0",
+]
+# Dependencies needed to run the scripts under examples/.
+examples = [
+    "matplotlib>=3.5",
+    "scipy>=1.7",
+]
+
 [tool.setuptools.packages.find]
 include = ["ggapp*"]
 exclude = ["examples*"]
