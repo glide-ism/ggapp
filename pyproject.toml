@@ -11,7 +11,7 @@ license = { file = "LICENSE" }
 requires-python = ">=3.10"
 authors = [{ name = "Douglas Brinkerhoff" }]
 dependencies = [
-    "cupy-cuda12x",
+    "cupy-cuda12x>=12.0.0",
     "glide",
 ]
 
