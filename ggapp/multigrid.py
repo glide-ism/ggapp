@@ -39,6 +39,7 @@ class Multigrid:
         self.state = MGStateManager(self)
         self.parameters = MGParameterManager(self)
         self.forcing = MGForcingManager(self)
+        self.coefficients = MGCoefficientManager(self)
 
     def create_grid_hierarchy(self,n_levels,restrict_fields=True):
         self.levels = [self.finest_grid]
@@ -62,6 +63,7 @@ class Multigrid:
             self.restrict_state(parent_grid,child_grid)
             self.restrict_parameters(parent_grid,child_grid)
             self.restrict_forcing(parent_grid,child_grid)
+            self.restrict_coefficients(parent_grid,child_grid)
         return child_grid
 
     def restrict_state(self,fine_grid,coarse_grid):
@@ -69,6 +71,11 @@ class Multigrid:
 
     def restrict_forcing(self,fine_grid,coarse_grid):
         self.restrict_cell(fine_grid.forcing.f.data,coarse_grid.forcing.f.data)
+
+    def restrict_coefficients(self,fine_grid,coarse_grid):
+        # The shift is a density coefficient (kappa^2 units) -> average.
+        self.restrict_cell(fine_grid.coefficients.shift.data,
+                           coarse_grid.coefficients.shift.data,method='avg')
     def restrict_parameters(self,fine_grid,coarse_grid):
         coarse_grid.parameters.kappa.set(fine_grid.parameters.kappa.value)
 
@@ -172,6 +179,19 @@ class MGForcingManager:
 
     def __repr__(self):
         return f'Top-level ({self.mg.n_levels} levels): \n'+self.mg.levels[0].forcing.__repr__()
+
+class MGCoefficientManager:
+    def __init__(self, mg):
+        self.mg = mg
+        self.shift = HierarchyFieldManager(
+            mg.levels,
+            getter=lambda g: g.coefficients.shift,
+            restrict=lambda f,c: mg.restrict_cell(f.data,c.data,method='avg'),
+            name="shift",
+        )
+
+    def __repr__(self):
+        return f'Top-level ({self.mg.n_levels} levels): \n'+self.mg.levels[0].coefficients.__repr__()
 
 class MGParameterManager:
     def __init__(self, mg):

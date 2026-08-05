@@ -14,6 +14,16 @@ class Forcing:
     f: Field | None = None
 
 @dataclass
+class Coefficients:
+    """Spatially varying operator coefficients. `shift` is a per-cell
+    diagonal added to the kappa^2 mass term (units of kappa^2, restricted by
+    averaging like any density coefficient); zero everywhere reproduces the
+    plain Matern operator exactly. Used e.g. as sqrt of a data-precision
+    density so the multigrid can invert the shifted factor (L + shift) as a
+    preconditioner for the conditioned-prior system (Q + D)."""
+    shift: Field | None = None
+
+@dataclass
 class Parameters:
     sigma: Constant = field(
         default_factory=lambda: Constant(
@@ -102,6 +112,7 @@ class MaternGrid:
         self.state = self._allocate_state()
         self.forcing = self._allocate_forcing()
         self.parameters = self._allocate_parameters()
+        self.coefficients = self._allocate_coefficients()
 
         self._forward_operators = None
         self._backward_operators = None
@@ -140,6 +151,18 @@ class MaternGrid:
 
     def _allocate_parameters(self):
         return Parameters()
+
+    def _allocate_coefficients(self):
+        shift = Field(
+            data = cp.zeros((self.ny,self.nx),dtype=cp.float32),
+            grid_entity=GridEntity.CELL,
+            dx=self.dx,
+            grid=self,
+            name='shift',
+            units='',
+            attrs={'long_name':'diagonal shift added to the kappa^2 mass term'}
+            )
+        return Coefficients(shift=shift)
 
 
 

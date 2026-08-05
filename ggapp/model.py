@@ -32,9 +32,9 @@ class MaternPrior:
     def set_top_level(self,level):
         self.top_level = level
 
-    def solve(self,rhs):
+    def solve(self,rhs,zero_init=True):
         self.mg.forcing.f.set(rhs,start_level=self.top_level)
-        self.forward_solver.solve(start_level=self.top_level)
+        self.forward_solver.solve(start_level=self.top_level,zero_init=zero_init)
 
     def sample(self):
         eta = cp.random.randn(self.mg[self.top_level].ny,self.mg[self.top_level].nx,dtype=cp.float32)
@@ -45,10 +45,10 @@ class MaternPrior:
 
         return cp.array(self.mg[self.top_level].state.u.data * self.mg[self.top_level].parameters.tau.value / self.mg[self.top_level].dx)
 
-    def forward(self,x):
+    def forward(self,x,zero_init=True):
         f = x
         for i in range(self.mg[self.top_level].parameters.alpha.value//2):
-            self.solve(f)
+            self.solve(f,zero_init=zero_init)
             f = self.mg[self.top_level].state.u.data
 
         return cp.array(self.mg[self.top_level].state.u.data * self.mg[self.top_level].parameters.tau.value / self.mg[self.top_level].dx)

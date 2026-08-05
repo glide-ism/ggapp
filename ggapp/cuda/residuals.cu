@@ -3,10 +3,11 @@ void compute_residual(
     float* __restrict__ r_u,
     const float* __restrict__ u,
     const float* __restrict__ rhs,
+    const float* __restrict__ shift,
     float kappa,
     float delta,
     float dx,
-    int ny, int nx, 
+    int ny, int nx,
     int stride, int halo)
 {
     int j = blockIdx.x * stride + (threadIdx.x - halo);
@@ -26,7 +27,7 @@ void compute_residual(
 
         
         float laplacian = delta*(4.0f * u_c - u_r - u_l - u_t - u_b)/(dx * dx);
-        float mass = kappa * kappa * u_c;
+        float mass = (kappa * kappa + shift[i * nx + j]) * u_c;
 	float forcing = rhs[i * nx + j];
 
         r_u[i * nx + j] = laplacian + mass - forcing; 

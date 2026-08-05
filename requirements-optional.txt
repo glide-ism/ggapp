@@ -1,0 +1,11 @@
+# Optional / extra dependencies for ggapp.
+# Install with:  pip install -r requirements.txt -r requirements-optional.txt
+#
+# These mirror [project.optional-dependencies] in pyproject.toml.
+
+# PyTorch autograd integration (ggapp.torch) -- the "torch" extra.
+torch>=2.0
+
+# Running the scripts under examples/ -- the "examples" extra.
+matplotlib>=3.5
+scipy>=1.7

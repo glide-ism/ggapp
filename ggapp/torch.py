@@ -41,6 +41,38 @@ class GGaPPMap(torch.autograd.Function):
         gz = model.forward(gu_)
         return None, torch.tensor(gz)
 
+class GGaPPCondition(torch.autograd.Function):
+    """Differentiable GP conditioning: out = u0 + (Q+D)^{-1} D (b - u0).
+
+    `conditioner` is a ggapp.conditioning.ConditionedPrior; `data` optionally
+    overrides its stored b for this call (e.g. randomize-then-optimize
+    per-sample perturbed data). The map is linear with self-adjoint-structured
+    Jacobian S = I - (Q+D)^{-1} D, and S^T g = g - D (Q+D)^{-1} g, so the
+    backward pass costs exactly one more PCG solve, shared between the u0
+    cotangent and the data cotangent (d out / d data = (Q+D)^{-1} D, whose
+    transpose applied to g is the same D*w). The whole solve stays in cupy;
+    the torch boundary is crossed once per direction.
+    """
+
+    @staticmethod
+    def forward(ctx,conditioner,u0,data=None):
+        ctx.conditioner = conditioner
+        u0_ = cp.array(u0.data)
+        data_ = None if data is None else cp.array(data.data)
+        mu = conditioner.correct(u0_, data=data_)
+        return torch.tensor(u0_ + mu)
+
+    @staticmethod
+    def backward(ctx,g):
+        c = ctx.conditioner
+        g_ = cp.array(g.data)
+        w = c.adjoint_solve(g_)
+        dw = c.precision * w
+        wants_g_data = (len(ctx.needs_input_grad) > 2
+                        and ctx.needs_input_grad[2])
+        g_data = torch.tensor(dw) if wants_g_data else None
+        return None, torch.tensor(g_ - dw), g_data
+
 GradTransform = Callable[[Tensor, Tensor, dict[str, Any], dict[str, Any]], Tensor | None]
 # Signature: fn(param, grad, state, group) -> transformed_grad
 # If the function mutates grad in-place, it may return None.

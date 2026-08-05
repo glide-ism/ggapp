@@ -1,0 +1,7 @@
+# Core runtime dependencies for the ggapp package.
+# These mirror [project.dependencies] in pyproject.toml.
+#
+# CuPy is an optional, CUDA-specific dependency (no universal wheel). Install the
+# wheel matching your CUDA toolkit, e.g.:  pip install cupy-cuda12x
+# or use the packaging extra:  pip install ggapp[cuda12]   (cuda11 / cuda12 / cuda13)
+glide

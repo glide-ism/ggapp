@@ -57,13 +57,14 @@ class ForwardOperators:
 
         kernel(grid_size, block_size,
                (out_u,
-                state.u.data,  
+                state.u.data,
                 f,
+                grid.coefficients.shift.data,
                 parameters.kappa.value,
                 parameters.delta.value,
                 grid.dx,
-                grid.ny, grid.nx, 
-                stride, halo)) 
+                grid.ny, grid.nx,
+                stride, halo))
 
         if return_norms:
             return cp.linalg.norm(out_u)
@@ -79,12 +80,13 @@ class ForwardOperators:
         forcing = grid.forcing
 
         kernel(grid_size, block_size,
-               (state.u.data, 
+               (state.u.data,
                 self.r_u,
+                grid.coefficients.shift.data,
                 parameters.kappa.value,
                 parameters.delta.value,
                 grid.dx,
-                grid.ny, grid.nx, stride, halo, 
+                grid.ny, grid.nx, stride, halo,
                 self.jacobi_config.omega)
         )
 
